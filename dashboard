@@ -1,0 +1,77 @@
+import os
+import socket
+import subprocess
+import time
+
+# Función para verificar la conectividad de una dirección IP
+def verificar_conectividad(ip):
+    print(f"\nVerificando la conectividad con la dirección IP: {ip}")
+    respuesta = os.system(f"ping -c 4 {ip}" if os.name != 'nt' else f"ping -n 4 {ip}")
+    if respuesta == 0:
+        print(f"La dirección IP {ip} está alcanzable.")
+    else:
+        print(f"No se pudo alcanzar la dirección IP {ip}.")
+
+# Función para escanear puertos de una dirección IP
+def escanear_puertos(ip, puertos):
+    print(f"\nEscaneando puertos en la dirección IP {ip}")
+    for puerto in puertos:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)  # Timeout de 1 segundo
+        resultado = sock.connect_ex((ip, puerto))
+        if resultado == 0:
+            print(f"El puerto {puerto} está abierto.")
+        else:
+            print(f"El puerto {puerto} está cerrado.")
+        sock.close()
+
+# Función para enviar un mensaje a través de un socket
+def enviar_mensaje(ip, puerto, mensaje):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((ip, puerto))
+        sock.sendall(mensaje.encode())
+        print(f"Mensaje enviado a {ip}:{puerto}")
+        sock.close()
+    except Exception as e:
+        print(f"Error al enviar el mensaje: {e}")
+
+# Función para mostrar el menú principal
+def mostrar_menu():
+    while True:
+        print("\nMenu Principal - Dashboard de Redes")
+        print("1 - Verificar conectividad a una IP")
+        print("2 - Escanear puertos de una IP")
+        print("3 - Enviar mensaje a un servidor")
+        print("0 - Salir")
+
+        eleccion = input("Elige una opción: ")
+
+        if eleccion == '0':
+            print("Saliendo del programa.")
+            break
+        elif eleccion == '1':
+            ip = input("Ingresa la dirección IP para verificar la conectividad: ")
+            verificar_conectividad(ip)
+        elif eleccion == '2':
+            ip = input("Ingresa la dirección IP para escanear puertos: ")
+            puertos = input("Ingresa los puertos a escanear (separados por comas): ")
+            puertos = [int(p) for p in puertos.split(",")]
+            escanear_puertos(ip, puertos)
+        elif eleccion == '3':
+            ip = input("Ingresa la dirección IP del servidor: ")
+            puerto = int(input("Ingresa el puerto del servidor: "))
+            mensaje = input("Ingresa el mensaje a enviar: ")
+            enviar_mensaje(ip, puerto, mensaje)
+        else:
+            print("Opción no válida. Por favor, intenta de nuevo.")
+
+# Función para mostrar un submenú (si lo deseas añadir en el futuro)
+def mostrar_sub_menu():
+    print("\nEste es un submenú de redes.")
+    # Aquí puedes agregar más opciones como verificar estado de interfaces de red, estadísticas, etc.
+    # Esta función se puede ampliar según lo que necesites.
+
+# Ejecutar el dashboard
+if __name__ == "__main__":
+    mostrar_menu()
